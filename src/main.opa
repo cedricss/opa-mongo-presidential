@@ -12,6 +12,19 @@ type result = {
 	int score,
 }
 
+database presidential @mongo {
+	result /first[{id}]
+}
+
+function table(arr) {
+	dbset(result, _) s = /presidential/first[arrondissement == arr; order -score; limit 50];
+	it = DbSet.iterator(s);
+	Iter.fold(
+		function(r, acc) { [table_row(r) | acc]	},
+		it, []
+	) |> List.rev;
+}
+
 function table_row(result) {
 	<tr>
 		<td>{ result.id }</td>
@@ -29,7 +42,7 @@ function tab_pan(arr) {
 	<div class="tab-pane" id="a{arr}">
 		<table class="table table-striped table-condensed">
 			<thead><td>Id</td><td>Bureau de vote</td><td>Candidat</td><td>Score</td><td>Action</td><td>Nb log</td></thead>
-			<tbody></tbody>
+			<tbody>{ table(arr) }</tbody>
 		</table>
 	</div>
 }
