@@ -10,11 +10,19 @@ type result = {
 	string candidate_name,
 	string candidate_first_name,
 	int score,
+	list(Date.date) log
 }
 
 database presidential @mongo {
 	result /first[{id}]
 }
+
+function increase(result) {
+	/presidential/first[id == result.id] <- { score += 800, log <+ Date.now() };
+	arr = result.arrondissement;
+	#{"a{arr}"} = tab_pan(arr);
+}
+
 
 function table(arr) {
 	dbset(result, _) s = /presidential/first[arrondissement == arr; order -score; limit 50];
@@ -32,9 +40,11 @@ function table_row(result) {
 		<td>{ result.candidate_name }</td>
 		<td>{ result.score }</td>
 		<td>
-			<a href="#" class="btn btn-mini"></a>
+			<a onclick={ function(_) { increase(result) } }  href="#" class="btn btn-mini">
+				Booster
+			</a>
 		</td>
-		<td></td>
+		<td>{ List.length(result.log) }</td>
 	</tr>
 }
 
